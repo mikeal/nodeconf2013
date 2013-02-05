@@ -14,11 +14,38 @@ All attendees will preinstall the `nodeconf2013` npm package. The npm package in
 
 Session are color coded. Do not share the color code keys with attendees, these codes are only so that each session can have a place to put relevant materials and a starting point for the people to write code in their session, they may be changed in the future and may not be public.
 
-* blue - Copters - Chris Williams, Emily Rose
-* brown - Streams - Max Ogden, Substack
-* green - Web Services - Eran Hammer, Mike Cantelon
-* orange - Core - Isaac Schlueter
-* pink - Distributed - Dominic Tarr
-* purple - Domains - Forrest Norvell, Domenic Denicola
-* red - Hardware - Elijah Insua, Rick Waldron
+* blue - `Copters` - Chris Williams, Emily Rose
+* brown - `Streams` - Max Ogden, Substack
+* green - `Web Services` - Eran Hammer, Mike Cantelon
+* orange - `Core` - Isaac Schlueter
+* pink - `Distributed` - Dominic Tarr
+* purple - `Domains` - Forrest Norvell, Domenic Denicola
+* red - `Hardware` - Elijah Insua, Rick Waldron
 * yellow - Unassigned (for now)
+
+
+### Schedule	
+
+This is still a draft and may change and only contains the aspects of the schedule that impact the sessions.
+
+##### June 28th
+
+* 08:00  `Breakfast`
+* 10:00  `Session 1`
+* 11:00	 `Session 2`
+* 12:00  `Lunch`
+* 14:00	 `Session 3`
+* 15:00	 `Session 4`
+* 16:00	 `Session 5`
+* 17:00  `Session 6`
+* 18:00	 `Dinner`
+
+##### June 29th
+	
+* 08:00  `Breakfast`
+* 10:00  `Session 7`
+* 11:00	 `Session 8`
+* 12:00	 `Lunch`
+* 14:00 - 18:00 `Unassigned`
+
+The second half of the day will be filled by a more freeform hack time. Considering lots of different ideas about what to do with this time.
