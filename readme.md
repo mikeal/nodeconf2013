@@ -21,7 +21,7 @@ Session are color coded. Do not share the color code keys with attendees, these 
 * pink - `Distributed` - Dominic Tarr
 * purple - `Domains` - Forrest Norvell, Domenic Denicola
 * red - `Hardware` - Elijah Insua, Rick Waldron
-* yellow - Unassigned (for now)
+* yellow - `DTrace` - Max Bruning
 
 
 ### Schedule	
