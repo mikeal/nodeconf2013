@@ -12,6 +12,21 @@
   "dependencies": {
     "request": "~2.21.0",
     "hapi": "1.x.x",
-    "express": "3.x.x"
+    "express": "3.x.x",
+    "through": "~2.3.4",
+    "duplexer": "~0.1.1",
+    "concat-stream": "~1.0.0",
+    "JSONStream": "~0.6.4",
+    "hyperstream": "~0.2.0",
+    "hyperglue": "~1.1.0",
+    "hyperspace": "~0.1.1",
+    "browserify": "~2.17.3",
+    "brfs": "~0.0.5",
+    "ecstatic": "~0.4.2",
+    "split": "~0.2.5",
+    "shoe": "~0.0.11",
+    "mux-demux": "~3.7.3",
+    "hyperstream": "~0.2.0",
+    "slice-file": "~0.2.1"
   }
 }
