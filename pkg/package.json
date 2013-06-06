@@ -1,0 +1,15 @@
+{
+  "name": "nodeconf2013",
+  "version": "0.0.0",
+  "description": "All the packages you'll need for NodeConf!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "Mikeal Rogers",
+  "license": "BSD",
+  "dependencies": {
+    "request": "~2.21.0"
+  }
+}
