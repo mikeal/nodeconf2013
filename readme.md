@@ -12,8 +12,6 @@ We have several spaces, all with their own constraints, and we can layout the ta
 
 All attendees will preinstall the `nodeconf2013` npm package. The npm package includes relevant dependencies and materials for a session. We don't want to give away what the session are about so do not include any detailed planning in the package, just the required dependencies and anything else you might need to help them like static file servers. We'll also have usb sticks with the package so that if the internet goes out we can still access any required materials so please include relevant documentation.
 
-Session are color coded. Do not share the color code keys with attendees, these codes are only so that each session can have a place to put relevant materials and a starting point for the people to write code in their session, they may be changed in the future and may not be public.
-
 * `Copters` - Emily Rose, aulvi
 * `Streams` - Max Ogden, Substack, Matt Podwysocki
 * `Web Services` - Eran Hammer, Mike Cantelon
