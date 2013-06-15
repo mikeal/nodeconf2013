@@ -26,7 +26,7 @@
     "split": "~0.2.5",
     "shoe": "~0.0.11",
     "mux-demux": "~3.7.3",
-    "hyperstream": "~0.2.0",
-    "slice-file": "~0.2.1"
+    "slice-file": "~0.2.1",
+	"ar-drone": "~0.1.0"
   }
 }
