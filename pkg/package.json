@@ -28,6 +28,10 @@
     "mux-demux": "~3.7.3",
     "slice-file": "~0.2.1",
     "ar-drone": "~0.1.0",
-    "uncurled": "*"
+    "uncurled": "*",
+    "optimist": "~0.5.2",
+    "stream-serializer": "~1.1.1",
+    "my-local-ip": "~1.0.0",
+    "dirty": "~0.9.7"
   }
 }
