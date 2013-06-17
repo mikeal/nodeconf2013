@@ -27,6 +27,7 @@
     "shoe": "~0.0.11",
     "mux-demux": "~3.7.3",
     "slice-file": "~0.2.1",
-	"ar-drone": "~0.1.0"
+    "ar-drone": "~0.1.0",
+    "uncurled": "*"
   }
 }
