@@ -39,6 +39,7 @@
     "crdt": "~3.5.1",
     "repred": "~1.0.1",
     "scuttlebutt": "~5.5.20",
-    "reconnect": "~1.4.2"
+    "reconnect": "~1.4.2",
+    "duplex": "~1.0.0"
   }
 }
