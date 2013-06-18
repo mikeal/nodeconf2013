@@ -1,0 +1,22 @@
+{
+  "name": "pow-server",
+  "version": "0.0.0",
+  "description": "simple endpoint for connection pool",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": "",
+  "keywords": [
+    "example",
+    "domains",
+    "work",
+    "prover"
+  ],
+  "author": "Forrest L Norvell <ogd@aoaioxxysz.net>",
+  "license": "BSD",
+  "dependencies": {
+    "concat-stream": "~1.0.0",
+    "generic-pool": "~2.0.3"
+  }
+}
