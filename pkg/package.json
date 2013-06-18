@@ -28,6 +28,7 @@
     "mux-demux": "~3.7.3",
     "slice-file": "~0.2.1",
     "ar-drone": "~0.1.0",
+    "johnny-five": "0.6.3",
     "uncurled": "*",
     "optimist": "~0.5.2",
     "stream-serializer": "~1.1.1",
