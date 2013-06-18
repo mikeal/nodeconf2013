@@ -1,0 +1,24 @@
+{
+  "name": "02-express-middleware",
+  "version": "0.0.0",
+  "description": "sample Express error-handling middleware that works with domains",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "keywords": [
+    "example",
+    "domains",
+    "express"
+  ],
+  "author": "Forrest L Norvell <ogd@aoaioxxysz.net>",
+  "license": "BSD",
+  "dependencies": {
+    "express": "~3.2.6",
+    "jade": "~0.31.2"
+  },
+  "devDependencies": {
+    "uncurled": "~1.3.0"
+  }
+}

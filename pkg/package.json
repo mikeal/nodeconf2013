@@ -28,11 +28,21 @@
     "mux-demux": "~3.7.3",
     "slice-file": "~0.2.1",
     "ar-drone": "~0.1.0",
+    "johnny-five": "0.6.3",
     "uncurled": "*",
+    "greadme": "*",
     "optimist": "~0.5.2",
     "stream-serializer": "~1.1.1",
     "my-local-ip": "~1.0.0",
     "dirty": "~0.9.7",
-    "stream-adventure": "*"
+    "stream-adventure": "*",
+    "tar": "~0.1.17",
+    "crdt": "~3.5.1",
+    "repred": "~1.0.1",
+    "scuttlebutt": "~5.5.20",
+    "reconnect": "~1.4.2",
+    "duplex": "~1.0.0",
+    "message-stream": "~1.0.0",
+    "udid": "~0.1.2"
   }
 }
