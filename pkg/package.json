@@ -33,6 +33,7 @@
     "stream-serializer": "~1.1.1",
     "my-local-ip": "~1.0.0",
     "dirty": "~0.9.7",
-    "stream-adventure": "*"
+    "stream-adventure": "*",
+    "tar": "~0.1.17"
   }
 }
