@@ -35,8 +35,15 @@ if (cluster.isMaster) {
   for (var i = 0; i < cpus; i++) cluster.fork();
 
   cluster.on("exit", function (worker) {
-    console.error("Worker " + worker.process.pid + " died. Welp. Time for another one.");
+    console.error("Worker %s died. Welp. Time for another one.",
+                  worker.process.pid);
     cluster.fork();
+  });
+
+  cluster.once("listening", function (worker, listener) {
+    console.log("a worker (pid %s) is listening on %s:%s",
+                worker.process.id, listener.address, listener.port);
+    if (process.send) process.send({"ready": true});
   });
 } else {
   createServer(function connected(req, res) {
@@ -51,11 +58,13 @@ if (cluster.isMaster) {
     d.add(res);
 
     d.run(function () {
+      // CRASHER: don't remove
       if (Math.random() < 1 / CRASH_FACTOR) {
         throw new Error("This problem is not to my liking. Giving up.");
       }
 
       req.pipe(catenator(function (body) {
+        // CRASHER: don't remove
         if (Math.random() < 1 / CRASH_FACTOR) {
           res.writeHead(500, {"Content-Type": "application/json"});
           // this is going to cause problems.
@@ -75,7 +84,6 @@ if (cluster.isMaster) {
         }
       }));
     });
-
   }).listen(1337, function listening() {
     console.log("worker %s ready", cluster.worker.id);
   });

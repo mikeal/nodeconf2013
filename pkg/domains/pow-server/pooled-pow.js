@@ -16,6 +16,7 @@ var Agent       = http.Agent;
  * requests will fail.
  */
 var CRASH_FACTOR = 3;
+var SERVER_URL = "http://localhost:1337";
 
 function post(target, agent, input, callback) {
   var parsed = url.parse(target);
@@ -54,10 +55,12 @@ module.exports = poolificate({
       return callback(new Error("unable to create connection to proof of work server " +
                                 "(for some strange reason)!"));
     } else {
-      return callback(null, {
-        "prove": function (input, callback) {
-          post("http://localhost:1337", agent, input, callback);
-        }
+      post(SERVER_URL, agent, "bootstrap", function () {
+        callback(null, {
+          "prove": function (input, callback) {
+            post(SERVER_URL, agent, input, callback);
+          }
+        });
       });
     }
   },
