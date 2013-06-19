@@ -27,6 +27,7 @@ var pool = require("./pooled-pow.js");
 var pow = fork("./pow.js");
 
 /**
+ ** KATA: what's the value of running the entire thing inside a domain?
  ** KATA: how do we use domains with pooled connections?
  **
  ** HINT: generic-pool instances need to be drained at shutdown

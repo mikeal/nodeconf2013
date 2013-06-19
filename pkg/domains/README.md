@@ -3,6 +3,13 @@ NodeConf 2013. All of them have things wrong with them. Your task is to figure
 out how to use domains to make them crash less and tell you more when they do
 crash.
 
+If you don't have curl available, run
+
+```shell
+cd express-middleware
+npm -g install node_modules/uncurled
+```
+
 Good luck!
 
 Forrest & Domenic

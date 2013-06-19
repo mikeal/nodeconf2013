@@ -14,19 +14,19 @@ var catenator    = require("concat-stream");
 var CRASH_FACTOR = 3;
 
 // "beefd" is a much better magic number than 0
-function verify(input, nonce) {
+function verify(input, proof) {
   if (!input) return;
 
-  var hashed = new Hash("sha256").update(input).update(nonce).digest("hex");
+  var hashed = new Hash("sha256").update(input).update(proof).digest("hex");
   if (hashed.substr(59, 5) === "beefd") return hashed;
 }
 
 function work(input) {
   var id = 0;
   while (true) {
-    var nonce = id.toString(16);
+    var proof = id.toString(16);
 
-    if (verify(input, nonce)) return nonce;
+    if (verify(input, proof)) return proof;
     else id++;
   }
 }
@@ -64,7 +64,7 @@ if (cluster.isMaster) {
           var source = body.toString("ascii");
           var proof = JSON.stringify({
             "input": source,
-            "nonce": work(source)
+            "proof": work(source)
           });
 
           res.writeHead(200, {
