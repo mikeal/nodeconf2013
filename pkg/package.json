@@ -41,6 +41,8 @@
     "repred": "~1.0.1",
     "scuttlebutt": "~5.5.20",
     "reconnect": "~1.4.2",
-    "duplex": "~1.0.0"
+    "duplex": "~1.0.0",
+    "message-stream": "~1.0.0",
+    "udid": "~0.1.2"
   }
 }
