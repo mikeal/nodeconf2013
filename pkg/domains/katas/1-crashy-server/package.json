@@ -1,0 +1,12 @@
+{
+    "name": "nodeconf2013-crashy-server",
+    "description": "A fragile server which can be crashed a lot",
+    "contributors": [
+        "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com/)",
+        "Forrest L Norvell <ogd@aoaioxxysz.net>"
+    ],
+    "license": "WTFPL",
+    "scripts": {
+        "start": "node server.js"
+    }
+}
