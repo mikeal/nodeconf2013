@@ -9,6 +9,11 @@ var createServer = require("http").createServer;
  * connection by calling pool.acquire, which takes a callback taking
  * two parameters, an error and a client API object.
  *
+ * Any resource acquired from a pool needs to be released back to it
+ * at the end of processing. Not doing so is an error.
+ *
+ * KATA: ensure that the client gets released, even in cases of errors.
+ *
  * The API has a single method on it, prove(), which takes a source
  * string to be sent to the proof-of-work service, as well as a
  * callback that will be called with the proof returned from the
@@ -22,7 +27,7 @@ var pool = require("./pooled-pow.js");
 var pow = fork("./pow.js");
 
 /**
- ** FIXME: how do we use domains with pooled connections?
+ ** KATA: how do we use domains with pooled connections?
  **
  ** HINT: generic-pool instances need to be drained at shutdown
  ** HINT: the worker process needs to be stopped at shutdown
@@ -32,8 +37,15 @@ createServer(function connected(req, res) {
     var source = body.toString("ascii");
 
     pool.acquire(function (error, client) {
-      client.prove(source, function (proof) {
-        // throw new Error("OH NOOO"); // FIXME: how does this get trapped by a domain?
+      client.prove(source, function (input) {
+        /*
+         * KATA: what happens when this fails?
+         * Without removing the validation that the parsing adds, make it less
+         * crash-prone using domains.
+         */
+        var proofObject = JSON.parse(input);
+        var proof = JSON.stringify(proofObject);
+
         res.writeHead(200, {
           "Content-Type": "application/json",
           "Content-Length": proof.length
