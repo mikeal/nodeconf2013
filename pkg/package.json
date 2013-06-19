@@ -30,6 +30,7 @@
     "ar-drone": "~0.1.0",
     "johnny-five": "0.6.3",
     "uncurled": "*",
+    "greadme": "*",
     "optimist": "~0.5.2",
     "stream-serializer": "~1.1.1",
     "my-local-ip": "~1.0.0",
