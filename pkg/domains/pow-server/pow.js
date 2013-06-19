@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var domain       = require("domain");
 var createServer = require("http").createServer;
