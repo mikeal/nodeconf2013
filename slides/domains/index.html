@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+
+<title>Domains: your friends and neighbors</title>
+
+<meta name="description" content="error-handling with domains in Node.js">
+<meta name="author" content="Forrest L Norvell and Domenic Denicola">
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="stylesheet" href="css/reveal.min.css">
+<link rel="stylesheet" href="css/theme/night.css" id="theme">
+
+<!-- For syntax highlighting -->
+<link rel="stylesheet" href="lib/css/zenburn.css">
+
+<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+<script>
+document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+</script>
+
+<!--[if lt IE 9]>
+                <script src="lib/js/html5shiv.js"></script>
+                <![endif]-->
+</head>
+
+<body>
+
+<div class="reveal">
+
+  <!-- Any section element inside of this container is displayed as a slide -->
+  <div class="slides">
+    <section>
+      <h1>Node.js domains</h1>
+      <h3>your friends and neighbors</h3>
+      <p>
+      <small><a href="http://twitter.com/othiym23">Forrest L Norvell</a> &amp; <a href="http://domenicdenicola.com">Domenic Denicola</a>, nodeconf 2013</small>
+      </p>
+    </section>
+
+    <section>
+      <h2>who</h2>
+
+      <ul>
+        <li>Forrest works on Node instrumentation for New Relic.</li>
+        <li>Domenic works for lab49, maintains many JavaScript libraries,
+        contributes to the evolution of JavaScript, and co-maintains the
+        Promises/A+ standard.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>domains: a <i>very</i> brief overview</h2>
+
+      <ul>
+        <li>try-catch doesn't work with async and <code>uncaughtException</code> is gross</li>
+        <li>domains added in 0.8 to simplify async error-handling</li>
+        <li>adds a standard mechanism for handling all the common error use cases</li>
+        <li>incurs a small performance penalty, but that's error-handling</li>
+      </ul>
+    </section>
+
+    <section>
+      <section>
+        <h3>getting started with domains</h3>
+        <pre><code data-trim class="javascript">
+var domain = require("domain");
+
+var d = domain.create();
+d.on("error", function (error) {
+  console.error("Well, this sucks: %s", error.message);
+  process.exit(1);
+});
+d.run(function () {
+  // do error-prone stuff here
+});
+        </code></pre>
+      </section>
+
+      <section>
+        <h3>Node.js "hello world" with domains</h3>
+        <pre><code data-trim class="javascript">
+var http = require('http'), domain = require('domain');
+
+http.createServer(function (req, res) {
+  var d = domain.create();
+
+  d.on("error", function (error) {
+    res.writeHead(500, {'Content-Type': 'text/plain'});
+    res.end('Couldn\'t fulfill request because of an error: ' + error.message);
+  });
+  d.run(function () {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Hello World\n');
+  });
+}).listen(1337, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:1337/');
+        </code></pre>
+      </section>
+    </section>
+
+    <section>
+      <section>
+        <h3>domain.add</h3>
+        <p><code>domain.add(emitter)</code> binds an EventEmitter to a domain.</p>
+        <ul>
+          <li><i>important:</i> Don't add streams or emitters that will be reused
+          for multiple requests to a domain.</li>
+          <li>Best to think of binding to a domain as immutable.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>request and response added to domain</h3>
+        <pre><code data-trim class="javascript">
+var http = require('http'), domain = require('domain');
+
+http.createServer(function (req, res) {
+  var d = domain.create();
+  d.on("error", function (error) { /* ... */ });
+
+  d.add(req);
+  d.add(res);
+
+  d.run(function () { /* ... */ });
+}).listen(1337, '127.0.0.1');
+        </code></pre>
+      </section>
+    </section>
+
+    <section>
+      <h3>let's handle some errors, part 1</h3>
+      <h4>a basic web server</h4>
+    </section>
+
+    <section>
+      <section>
+        <h3>binding functions into domains</h3>
+
+        <ul>
+          <li><code>domain.bind(fn)</code> ensures that any errors inside
+          <code>fn</code> are trapped by the domain</li>
+          <li><code>domain.intercept(fn)</code> is the same, but takes a
+          conventional Node callback and traps the error parameter in the
+          domain</li>
+        </ul>
+      </section>
+
+      <section>
+        <pre><code data-trim class="javascript">
+var d = domain.create();
+// ...
+fs.readFile("filename.txt", function (error, data) {
+  if (error) return d.emit("error", error);
+  // do stuff with contents
+});
+        </code></pre>
+
+        <p>becomes</p>
+
+        <pre><code data-trim class="javascript">
+var d = domain.create();
+// ...
+fs.readFile("filename.txt", d.intercept(function (data) {
+  // do stuff with contents
+}));
+        </code></pre>
+      </section>
+    </section>
+
+    <section>
+      <section>
+        <h3>connection pools are weird</h3>
+
+        <ul>
+          <li>a single EventEmitter used across many requests</li>
+          <li>not all connection-pooling libraries are updated to use domains
+          <small><i>(well, OK, most haven't been)</i></small></li>
+          <li>use <code>domain.bind(callback)</code> (or
+          <code>domain.intercept(callback)</code>) to trap errors in your
+          code.</li>
+          <li>can also run the connection pool inside its own domain using
+          <code>domain.run()</code>, but you'll still want to explicitly bind
+          your application callbacks to the lexically closest domain</li>
+        </ul>
+      </section>
+
+      <section>
+        <pre><code data-trim class="javascript">
+var pool;
+var poolD = domain.create();
+poolD.run(function () {
+  pool = new mydb.Pool();
+  poolD.on("error", function (error) {
+    console.error("Connection pool exploded with '%s'. Trying clean shutdown.", error.message);
+    pool.flush();
+    pool.close(function () { process.exit(1); });
+  });
+});
+
+var client = require("./mydb/client.js")(pool);
+
+function processUsers(error, users) { /* do stuff */ }
+
+function getUsers() {
+  var d = domain.create();
+  d.on("error", function (error) { /* custom error-handling */ });
+  client.getUsers(d.bind(processUsers));
+}
+        </code></pre>
+      </section>
+    </section>
+
+    <section>
+      <h3>let's handle some errors, part 2</h3>
+      <h4>a proof of work server with a connection pool</h4>
+    </section>
+
+    <section>
+      <section>
+        <h3>Express, middleware, &amp; error handling</h3>
+
+        <ul>
+          <li>Express is built on Connect, which composes middleware (functions)
+          into <i>continuation chains</i></li>
+          <li>each middleware function is evaluated in a try-catch clause, and
+          errors are propagated via the continuations</li>
+          <li>to recover these errors, you need to use an error-handling
+          middleware (e.g. <code>express.errorHandler()</code>)</li>
+          <li>two ways to combine domains with Connect error handlers:</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Express &amp; domains 1</h3>
+        <h4>wrap every request in a domain, use the default error handler</h4>
+
+        <pre><code data-trim class="javascript">
+app.use(function (req, res, next) {
+  var d = domain.create();
+  d.on("error", next);
+  d.run(next);
+});
+// all the other middlewares in the stack
+app.use(express.errorHandler());
+        </code></pre>
+
+        <p>One nice thing is that the built-in error handler respects the
+        <code>Accepts</code> header coming from the user ageint.</p>
+      </section>
+
+      <section>
+        <h3>Express &amp; domains 2</h3>
+        <h4>create domains explicitly in routes, trap via error handler</h4>
+
+        <pre><code data-trim class="javascript">
+var defaultHandler = express.errorHandler();
+
+// set up other middleware, then:
+app.use(function (error, req, res, next) {
+  if (domain.active) {
+    domain.active.emit("error", err);
+  } else {
+    defaultHandler(err, req, res, next);
+  }
+});
+
+app.get("/crashy", function (req, res) {
+  var d = domain.create();
+  d.on("error", function (error) {
+    res.send(500, {"error": error.message});
+  });
+  d.run(function () { throw new Error("oops"); });
+});
+        </code></pre>
+      </section>
+    </section>
+
+    <section>
+      <h3>let's handle some errors, part 3</h3>
+      <h4>Express server with some crippling issues</h4>
+    </section>
+
+    <section>
+      <section>
+        <h3>informative shutdown vs On Error Resume</h3>
+
+        <ul>
+          <li>Node uses side effects, so more often than not, errors leave the process in an undefined state.</li>
+          <li>Better safe than sorry: capture error for user, shut down cleanly.</li>
+          <li>If actions are side-effect free, you <i>can</i> capture the error and move on.</li>
+          <li>How often do you <b>know</b> actions are free of effects? Do you want to make Isaac sad?</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>cast off your mental chains</h3>
+        <h4>use domains with confidence</h4>
+
+        <ul>
+          <li>Between <code>domain.run()</code>, <code>domain.bind()</code>,
+          <code>domain.add()</code>, and <code>domain.intercept()</code> you can
+          handle all three of the common mechanisms for signaling errors in node
+          (callback convention, error events, and try/catch).</li>
+          <li>It's often easier just to throw inside code that will be run in a
+          domain and let Node handle it.</li>
+          <li>Also maybe faster than try/catch.</li>
+        </ul>
+      </section>
+    </section>
+
+    <section>
+      <section>
+        <h3>domains from the bottom up</h3>
+
+        <ul>
+          <li><code>domain.enter()</code> and <code>domain.exit()</code> are the primitives
+          that set up and tear down domains.</li>
+          <li><code>domain.exit()</code> gets called both
+          when errors are trapped and when domains are exited normally.</li>
+          <li>Conceptually, <code>domain.bind()</code> is a wrapper around
+          <code>Function.bind()</code>, <code>domain.enter()</code>, and
+          <code>domain.exit()</code>:
+
+          <pre><code data-trim class="javascript">
+Domain.prototype.bind = function (callback) {
+  return function () {
+    this.enter();
+    callback();
+    this.exit();
+  }.bind(this);
+};
+
+Domain.prototype.intercept = function (callback) {
+  return function (error) {
+    if (error) return this.emit("error", error);
+    this.enter();
+    callback.apply(null, Array.prototype.slice.apply(arguments, 1));
+    this.exit();
+  }.bind(this);
+}
+          </code></pre></li>
+
+          <li>In turn, <code>domain.run()</code> is just an immediately invoked
+          version of <code>domain.bind()</code>.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>nesting domains</h3>
+
+        <ul>
+          <li>Node maintains a domain stack</li>
+          <li><code>domain.enter()</code> pushes a domain on the stack,
+          <code>domain.exit()</code> pops that domain <i>and all the domains
+          above it on the stack</i></li>
+          <li>this is analogous to how the nonlocal exit of a <code>throw</code>
+          pops multiple stack frames in traditional exception handling</li>
+          <li>it does limit the usefulness of domains for things other than error handling</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>finding the active domain</h3>
+
+        <ul>
+          <li>in two places: <code>process.domain</code> and <code>domain.active</code></li>
+          <li>can feature-test for <code>process.domain</code> in code where
+          domains are optional or can be used opportunistically</li>
+          <li>for code built explicitly to be used with domains, use <code>domain.active</code></li>
+          <li>the above are just stabs at conventionalizing uaage – domains are
+          still experimental and this isn't frozen yet</li>
+        </ul>
+      </section>
+    </section>
+
+    <section>
+      <h2>bonus round: convince Domenic to talk about domains and promises</h2>
+    </section>
+
+  </div>
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.min.js"></script>
+
+<script>
+
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+  controls: true,
+  progress: true,
+  history: true,
+  center: true,
+
+  theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+  transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+
+  // Optional libraries used to extend on reveal.js
+  dependencies: [
+    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+    { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+    { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+    // { src: 'plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; } }
+    // { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+  ]
+});
+
+</script>
+
+</body>
+</html>
