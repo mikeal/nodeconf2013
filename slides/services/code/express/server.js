@@ -40,7 +40,6 @@ var user = function (req, res) {
   if (!item) return res.send(404, 'not found');
   res.json(item);
 };
-
 app.get('/user/:id?', auth, user);
 
 http.createServer(app).listen(3000);
