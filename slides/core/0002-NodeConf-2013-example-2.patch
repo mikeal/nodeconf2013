@@ -1,0 +1,77 @@
+From 6c624024462380f6fdb42aabf91130497d0d2e5b Mon Sep 17 00:00:00 2001
+From: isaacs <i@izs.me>
+Date: Tue, 25 Jun 2013 17:07:05 -0700
+Subject: [PATCH 2/4] NodeConf 2013: example 2
+
+---
+ lib/net.js      |  7 +++++++
+ src/tcp_wrap.cc | 15 +++++++++++++++
+ src/tcp_wrap.h  |  1 +
+ 3 files changed, 23 insertions(+)
+
+diff --git a/lib/net.js b/lib/net.js
+index 3db2c15..27b4395 100644
+--- a/lib/net.js
++++ b/lib/net.js
+@@ -29,6 +29,13 @@ var cluster;
+ 
+ function noop() {}
+ 
++
++// Export the hello function
++exports.hello = function() {
++  return process.binding('tcp_wrap').hello();
++};
++
++
+ // constructor for lazy loading
+ function createPipe() {
+   var Pipe = process.binding('pipe_wrap').Pipe;
+diff --git a/src/tcp_wrap.cc b/src/tcp_wrap.cc
+index 9901347..caefc74 100644
+--- a/src/tcp_wrap.cc
++++ b/src/tcp_wrap.cc
+@@ -57,6 +57,18 @@ typedef class ReqWrap<uv_connect_t> ConnectWrap;
+ Local<Object> AddressToJS(const sockaddr* addr);
+ 
+ 
++// add the function here.
++// Below all the definitions at the top
++Handle<Value> TCPWrap::Hello(const Arguments& args) {
++  // Define a HandleScope.  This lets the garbage collector
++  // do the magic thing with cleaning up any data we create
++  HandleScope scope;
++
++  // Return the JavaScript string "world"
++  return String::New("world");
++}
++
++
+ Local<Object> TCPWrap::Instantiate() {
+   // If this assert fire then process.binding('tcp_wrap') hasn't been
+   // called yet.
+@@ -126,6 +138,9 @@ void TCPWrap::Initialize(Handle<Object> target) {
+   oncomplete_sym = NODE_PSYMBOL("oncomplete");
+ 
+   target->Set(String::NewSymbol("TCP"), tcpConstructor);
++
++  // Export our function here.
++  NODE_SET_METHOD(target, "hello", Hello);
+ }
+ 
+ 
+diff --git a/src/tcp_wrap.h b/src/tcp_wrap.h
+index 9b8cd29..16c366a 100644
+--- a/src/tcp_wrap.h
++++ b/src/tcp_wrap.h
+@@ -48,6 +48,7 @@ class TCPWrap : public StreamWrap {
+   static v8::Handle<v8::Value> Connect(const v8::Arguments& args);
+   static v8::Handle<v8::Value> Connect6(const v8::Arguments& args);
+   static v8::Handle<v8::Value> Open(const v8::Arguments& args);
++  static v8::Handle<v8::Value> Hello(const v8::Arguments& args);
+ 
+ #ifdef _WIN32
+   static v8::Handle<v8::Value> SetSimultaneousAccepts(const v8::Arguments& args);
+-- 
+1.8.2
+

@@ -1,0 +1,11 @@
+$ make -j4
+make -C out BUILDTYPE=Release V=
+  ACTION _tmp_node_node_gyp_node_js2c_host_node_js2c /tmp/node/out/Release/obj/gen/node_natives.h
+  CXX(target) /tmp/node/out/Release/obj.target/node/src/node_javascript.o
+  LINK(target) /tmp/node/out/Release/node
+ld: warning: alignment lost in merging tentative definition _OPENSSL_ia32cap_P
+ld: warning: _OPENSSL_ia32cap_P has different visibility (hidden) in
+/tmp/node/out/Release/libopenssl.a(x86_64cpuid.o) and (default) in
+/tmp/node/out/Release/libopenssl.a(cryptlib.o)
+  LINK(target) /tmp/node/out/Release/node: Finished
+ln -fs out/Release/node node

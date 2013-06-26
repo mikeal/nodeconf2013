@@ -1,0 +1,2 @@
+$ cd path/to/node
+$ vim test/simple/test-net-hello.js
