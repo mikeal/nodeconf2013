@@ -145,10 +145,11 @@ http.createServer(function (req, res) {
 
         <ul>
           <li><code>domain.bind(fn)</code> ensures that any errors inside
-          <code>fn</code> are trapped by the domain</li>
+          <code>fn</code> are trapped by the domain.</li>
           <li><code>domain.intercept(fn)</code> is the same, but takes a
           conventional Node callback and traps the error parameter in the
-          domain</li>
+          domain. <i>The parameter <b>must</b> be an instance of
+          Error.</i></li>
         </ul>
       </section>
 
@@ -374,7 +375,7 @@ Domain.prototype.intercept = function (callback) {
           <li>can feature-test for <code>process.domain</code> in code where
           domains are optional or can be used opportunistically</li>
           <li>for code built explicitly to be used with domains, use <code>domain.active</code></li>
-          <li>the above are just stabs at conventionalizing uaage – domains are
+          <li>the above are just stabs at conventionalizing usage – domains are
           still experimental and this isn't frozen yet</li>
         </ul>
       </section>
