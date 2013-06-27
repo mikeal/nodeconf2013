@@ -1,0 +1,123 @@
+From 4060be12bc3b716735515c14f64a2993913d0431 Mon Sep 17 00:00:00 2001
+From: isaacs <i@izs.me>
+Date: Tue, 25 Jun 2013 17:36:39 -0700
+Subject: [PATCH 3/4] NodeConf 2013: exercize
+
+---
+ lib/_http_outgoing.js         | 12 +++++++
+ test/simple/test-http-json.js | 83 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 95 insertions(+)
+ create mode 100644 test/simple/test-http-json.js
+
+diff --git a/lib/_http_outgoing.js b/lib/_http_outgoing.js
+index 8455b91..459b833 100644
+--- a/lib/_http_outgoing.js
++++ b/lib/_http_outgoing.js
+@@ -577,3 +577,15 @@ OutgoingMessage.prototype._flush = function() {
+     this.emit('drain');
+   }
+ };
++
++OutgoingMessage.prototype.json = function(obj) {
++  try {
++    var json = JSON.stringify(obj);
++  } catch (er) {
++    return this.emit('error', er);
++  }
++
++  this.setHeader('content-type', 'application/json');
++  this.setHeader('content-length', Buffer.byteLength(json, 'utf8'));
++  this.end(json, 'utf8');
++};
+diff --git a/test/simple/test-http-json.js b/test/simple/test-http-json.js
+new file mode 100644
+index 0000000..f15c4fb
+--- /dev/null
++++ b/test/simple/test-http-json.js
+@@ -0,0 +1,83 @@
++// Copyright Joyent, Inc. and other Node contributors.
++//
++// Permission is hereby granted, free of charge, to any person obtaining a
++// copy of this software and associated documentation files (the
++// "Software"), to deal in the Software without restriction, including
++// without limitation the rights to use, copy, modify, merge, publish,
++// distribute, sublicense, and/or sell copies of the Software, and to permit
++// persons to whom the Software is furnished to do so, subject to the
++// following conditions:
++//
++// The above copyright notice and this permission notice shall be included
++// in all copies or substantial portions of the Software.
++//
++// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
++// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
++// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
++// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
++// USE OR OTHER DEALINGS IN THE SOFTWARE.
++
++var common = require('../common');
++var assert = require('assert');
++
++var http = require('http');
++
++// just some random object thing
++var expect = {
++  'üñîçø∂é': true,
++  emojis: [ '1⃣', '☔', '🛃', '😻', '😆' ],
++  number: 1,
++  null: null,
++  child: { foo: 'bar', object: { foo: 'bar' } },
++  'qu"\'otes': [ '"', "'" ]
++};
++
++var expectLength = Buffer.byteLength(JSON.stringify(expect), 'utf8');
++
++var server = http.createServer(function(req, res) {
++  testIncoming(req, function() {
++    res.json(expect);
++  });
++
++  server.close();
++});
++
++
++server.listen(common.PORT, function() {
++  var req = http.request({
++    host: 'localhost',
++    port: common.PORT,
++    path: '/',
++    method: 'PUT'
++  });
++
++  req.on('response', function(res) {
++    testIncoming(res, function() {
++      // this is the end.
++      console.log('ok');
++    });
++  });
++
++  req.json(expect);
++});
++
++
++function testIncoming(message, cb) {
++  assert.equal(message.headers['content-type'], 'application/json');
++  assert.equal(+message.headers['content-length'], expectLength);
++
++  // verify that it's the expected json
++  message.setEncoding('utf8');
++  var body = '';
++  message.on('data', function(chunk) {
++    body += chunk;
++  });
++
++  message.on('end', function() {
++    body = JSON.parse(body);
++    assert.deepEqual(body, expect);
++    cb();
++  });
++}
+-- 
+1.8.2
+

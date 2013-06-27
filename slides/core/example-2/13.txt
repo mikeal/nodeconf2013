@@ -1,0 +1,4 @@
+$ ./node test/simple/test-net-hello.js
+ok
+
+## TEST PASSES! WoOo!

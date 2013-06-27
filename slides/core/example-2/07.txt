@@ -1,0 +1,12 @@
+$ make -j4
+make -C out BUILDTYPE=Release V=
+  CXX(target) /tmp/node/out/Release/obj.target/node/src/tcp_wrap.o
+  LINK(target) /tmp/node/out/Release/node
+ld: warning: alignment lost in merging tentative definition _OPENSSL_ia32cap_P
+ld: warning: _OPENSSL_ia32cap_P has different visibility (hidden) in
+/tmp/node/out/Release/libopenssl.a(x86_64cpuid.o) and (default) in
+/tmp/node/out/Release/libopenssl.a(cryptlib.o)
+  LINK(target) /tmp/node/out/Release/node: Finished
+ln -fs out/Release/node node
+
+## then demo the first part...

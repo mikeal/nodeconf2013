@@ -1,0 +1,34 @@
+From 9a2b88429b16675ceda9395da82515f648a4d9ee Mon Sep 17 00:00:00 2001
+From: isaacs <i@izs.me>
+Date: Tue, 25 Jun 2013 17:37:25 -0700
+Subject: [PATCH 4/4] NodeConf 2013: exercize extra credit
+
+---
+ lib/_http_outgoing.js | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/_http_outgoing.js b/lib/_http_outgoing.js
+index 459b833..1a0650b 100644
+--- a/lib/_http_outgoing.js
++++ b/lib/_http_outgoing.js
+@@ -578,14 +578,14 @@ OutgoingMessage.prototype._flush = function() {
+   }
+ };
+ 
+-OutgoingMessage.prototype.json = function(obj) {
++OutgoingMessage.prototype.json = function(obj, indent, cb) {
+   try {
+-    var json = JSON.stringify(obj);
++    var json = JSON.stringify(obj, null, indent);
+   } catch (er) {
+     return this.emit('error', er);
+   }
+ 
+   this.setHeader('content-type', 'application/json');
+   this.setHeader('content-length', Buffer.byteLength(json, 'utf8'));
+-  this.end(json, 'utf8');
++  this.end(json, 'utf8', cb);
+ };
+-- 
+1.8.2
+

@@ -1,0 +1,54 @@
+From a5f9918aa711da0d3c4e0b43c03a550df101a5c5 Mon Sep 17 00:00:00 2001
+From: isaacs <i@izs.me>
+Date: Tue, 25 Jun 2013 17:01:46 -0700
+Subject: [PATCH 1/4] NodeConf 2013: example 1
+
+---
+ test/simple/test-net-hello.js | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+ create mode 100644 test/simple/test-net-hello.js
+
+diff --git a/test/simple/test-net-hello.js b/test/simple/test-net-hello.js
+new file mode 100644
+index 0000000..3beb940
+--- /dev/null
++++ b/test/simple/test-net-hello.js
+@@ -0,0 +1,35 @@
++// Copyright Joyent, Inc. and other Node contributors.
++//
++// Permission is hereby granted, free of charge, to any person obtaining a
++// copy of this software and associated documentation files (the
++// "Software"), to deal in the Software without restriction, including
++// without limitation the rights to use, copy, modify, merge, publish,
++// distribute, sublicense, and/or sell copies of the Software, and to permit
++// persons to whom the Software is furnished to do so, subject to the
++// following conditions:
++//
++// The above copyright notice and this permission notice shall be included
++// in all copies or substantial portions of the Software.
++//
++// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
++// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
++// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
++// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
++// USE OR OTHER DEALINGS IN THE SOFTWARE.
++
++var common = require('../common');
++var assert = require('assert');
++
++// Require the net module
++var net = require('net');
++
++// verify the type of net.hello is function
++assert.equal(typeof net.hello, 'function');
++
++// verify the return value of net.hello()
++assert.equal(net.hello(), 'world');
++
++// print out something so that we know it ran all the way
++console.log('ok');
+-- 
+1.8.2
+
