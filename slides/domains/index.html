@@ -90,10 +90,10 @@ var http = require('http'), domain = require('domain');
 
 http.createServer(function (req, res) {
   var d = domain.create();
-
   d.on("error", function (error) {
     res.writeHead(500, {'Content-Type': 'text/plain'});
-    res.end('Couldn\'t fulfill request because of an error: ' + error.message);
+    res.end('Couldn\'t fulfill request because of an error: ' +
+            error.message);
   });
   d.run(function () {
     res.writeHead(200, {'Content-Type': 'text/plain'});
@@ -137,6 +137,68 @@ http.createServer(function (req, res) {
     <section>
       <h3>let's handle some errors, part 1</h3>
       <h4>a basic web server</h4>
+    </section>
+
+    <section>
+      <section>
+        <h3>Express, middleware, &amp; error handling</h3>
+
+        <ul>
+          <li>Express is built on Connect, which composes middleware (functions)
+          into <i>continuation chains</i></li>
+          <li>each middleware function is evaluated in a try-catch clause, and
+          errors are propagated via the continuations</li>
+          <li>to recover these errors, you need to use an error-handling
+          middleware (e.g. express.errorHandler)</li>
+          <li>two ways to combine domains with Connect error handlers:</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Express &amp; domains 1</h3>
+        <h4>wrap every request in a domain, use the default error handler</h4>
+
+        <pre><code data-trim class="javascript">
+app.use(function (req, res, next) {
+  var d = domain.create();
+  d.on("error", next);
+  d.run(next);
+});
+// all the other middlewares in the stack
+app.use(express.errorHandler());
+        </code></pre>
+
+        <p>One nice thing is that the built-in error handler respects the
+        <code>Accept</code> header coming from the user agent.</p>
+      </section>
+
+      <section>
+        <h3>Express &amp; domains 2</h3>
+        <h4>create domains explicitly in routes, trap via error handler</h4>
+
+        <pre><code data-trim class="javascript">
+var defaultHandler = express.errorHandler();
+app.use(function (error, req, res, next) {
+  if (domain.active) {
+    domain.active.emit("error", error);
+  } else {
+    defaultHandler(error, req, res, next);
+  }
+});
+app.get("/crashy", function (req, res) {
+  var d = domain.create();
+  d.on("error", function (error) {
+    res.send(500, {"error": error.message});
+  });
+  d.run(function () { throw new Error("oops"); });
+});
+        </code></pre>
+      </section>
+    </section>
+
+    <section>
+      <h3>let's handle some errors, part 2</h3>
+      <h4>Express server with some crippling issues</h4>
     </section>
 
     <section>
@@ -195,8 +257,7 @@ fs.readFile("filename.txt", d.intercept(function (data) {
       <section>
         <pre><code data-trim class="javascript">
 var pool;
-var poolD = domain.create();
-poolD.run(function () {
+var poolD = domain.create(); poolD.run(function () {
   pool = new mydb.Pool();
   poolD.on("error", function (error) {
     console.error("Connection pool exploded with '%s'. Trying clean shutdown.", error.message);
@@ -204,11 +265,8 @@ poolD.run(function () {
     pool.close(function () { process.exit(1); });
   });
 });
-
 var client = require("./mydb/client.js")(pool);
-
 function processUsers(error, users) { /* do stuff */ }
-
 function getUsers() {
   var d = domain.create();
   d.on("error", function (error) { /* custom error-handling */ });
@@ -219,73 +277,8 @@ function getUsers() {
     </section>
 
     <section>
-      <h3>let's handle some errors, part 2</h3>
-      <h4>a proof of work server with a connection pool</h4>
-    </section>
-
-    <section>
-      <section>
-        <h3>Express, middleware, &amp; error handling</h3>
-
-        <ul>
-          <li>Express is built on Connect, which composes middleware (functions)
-          into <i>continuation chains</i></li>
-          <li>each middleware function is evaluated in a try-catch clause, and
-          errors are propagated via the continuations</li>
-          <li>to recover these errors, you need to use an error-handling
-          middleware (e.g. <code>express.errorHandler()</code>)</li>
-          <li>two ways to combine domains with Connect error handlers:</li>
-        </ul>
-      </section>
-
-      <section>
-        <h3>Express &amp; domains 1</h3>
-        <h4>wrap every request in a domain, use the default error handler</h4>
-
-        <pre><code data-trim class="javascript">
-app.use(function (req, res, next) {
-  var d = domain.create();
-  d.on("error", next);
-  d.run(next);
-});
-// all the other middlewares in the stack
-app.use(express.errorHandler());
-        </code></pre>
-
-        <p>One nice thing is that the built-in error handler respects the
-        <code>Accepts</code> header coming from the user ageint.</p>
-      </section>
-
-      <section>
-        <h3>Express &amp; domains 2</h3>
-        <h4>create domains explicitly in routes, trap via error handler</h4>
-
-        <pre><code data-trim class="javascript">
-var defaultHandler = express.errorHandler();
-
-// set up other middleware, then:
-app.use(function (error, req, res, next) {
-  if (domain.active) {
-    domain.active.emit("error", err);
-  } else {
-    defaultHandler(err, req, res, next);
-  }
-});
-
-app.get("/crashy", function (req, res) {
-  var d = domain.create();
-  d.on("error", function (error) {
-    res.send(500, {"error": error.message});
-  });
-  d.run(function () { throw new Error("oops"); });
-});
-        </code></pre>
-      </section>
-    </section>
-
-    <section>
       <h3>let's handle some errors, part 3</h3>
-      <h4>Express server with some crippling issues</h4>
+      <h4>a proof of work server with a connection pool</h4>
     </section>
 
     <section>
@@ -317,6 +310,11 @@ app.get("/crashy", function (req, res) {
     </section>
 
     <section>
+      <h3>extras &amp; bonus stuff</h3>
+      <h4>more technical aspects of domains</h4>
+    </section>
+
+    <section>
       <section>
         <h3>domains from the bottom up</h3>
 
@@ -325,10 +323,24 @@ app.get("/crashy", function (req, res) {
           that set up and tear down domains.</li>
           <li><code>domain.exit()</code> gets called both
           when errors are trapped and when domains are exited normally.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>domains from the bottom up</h3>
+
+        <ul>
+          <li><code>domain.enter()</code> and <code>domain.exit()</code> are the primitives
           <li>Conceptually, <code>domain.bind()</code> is a wrapper around
           <code>Function.bind()</code>, <code>domain.enter()</code>, and
           <code>domain.exit()</code>:
+        </ul>
+      </section>
 
+      <section>
+        <h3>domains from the bottom up</h3>
+
+        <ul>
           <pre><code data-trim class="javascript">
 Domain.prototype.bind = function (callback) {
   return function () {
@@ -347,11 +359,18 @@ Domain.prototype.intercept = function (callback) {
   }.bind(this);
 }
           </code></pre></li>
+        </ul>
+      </section>
 
+      <section>
+        <h3>domains from the bottom up</h3>
+
+        <ul>
           <li>In turn, <code>domain.run()</code> is just an immediately invoked
           version of <code>domain.bind()</code>.</li>
         </ul>
       </section>
+
 
       <section>
         <h3>nesting domains</h3>
